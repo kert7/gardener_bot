@@ -1,13 +1,48 @@
 import streamlit as st
 from openai import OpenAI
 
-# Show title and description.
-st.title("💬 Chatbot")
-st.write(
-    "This is a simple chatbot that uses OpenAI's GPT-3.5 model to generate responses. "
-    "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys). "
-    "You can also learn how to build this app step by step by [following our tutorial](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps)."
+# Set custom page config for colors and emoji favicon
+st.set_page_config(page_title="Gardener Chatbot", page_icon="🌱", layout="centered", initial_sidebar_state="auto")
+
+# Add custom CSS for a richer green background and more readable text
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background: linear-gradient(135deg, #388e3c 0%, #81c784 100%) !important;
+        min-height: 100vh;
+        color: #fff !important;
+    }
+    .stMarkdown, .stTextInput, .stChatInput, .stCaption, .stTitle, .stInfo, .stAlert, .stChatMessage {
+        color: #fff !important;
+    }
+    .leaf {
+        position: fixed;
+        z-index: 0;
+        width: 80px;
+        opacity: 0.18;
+    }
+    .leaf.top-left { top: 10px; left: 10px; transform: rotate(-20deg); }
+    .leaf.top-right { top: 10px; right: 10px; transform: rotate(20deg) scaleX(-1); }
+    .leaf.bottom-left { bottom: 10px; left: 10px; transform: rotate(15deg); }
+    .leaf.bottom-right { bottom: 10px; right: 10px; transform: rotate(-15deg) scaleX(-1); }
+    </style>
+    <img src="https://cdn.pixabay.com/photo/2013/07/12/13/57/leaf-147280_1280.png" class="leaf top-left" />
+    <img src="https://cdn.pixabay.com/photo/2013/07/12/13/57/leaf-147280_1280.png" class="leaf top-right" />
+    <img src="https://cdn.pixabay.com/photo/2013/07/12/13/57/leaf-147280_1280.png" class="leaf bottom-left" />
+    <img src="https://cdn.pixabay.com/photo/2013/07/12/13/57/leaf-147280_1280.png" class="leaf bottom-right" />
+    """,
+    unsafe_allow_html=True
 )
+
+# Show title and description.
+st.title("Gardener Chatbot 🌱")
+st.caption("\"To plant a garden is to believe in tomorrow.\" – Audrey Hepburn")
+st.write("This is a simple chatbot that uses the OpenAI API to answer gardening questions.")
+
+# Plant info input section
+st.subheader("🌻 Which plant are you interested in?")
+plant_name = st.text_input("Type the name of a plant (e.g., tomato, basil, rose)...")
 
 # Ask user for their OpenAI API key via `st.text_input`.
 # Alternatively, you can store the API key in `./.streamlit/secrets.toml` and access it
@@ -32,20 +67,34 @@ else:
 
     # Create a chat input field to allow the user to enter a message. This will display
     # automatically at the bottom of the page.
-    if prompt := st.chat_input("What is up?"):
+    if prompt := st.chat_input("Ask grandpa gardener anything about your plant or gardening!"):
 
         # Store and display the current prompt.
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
+        # Build system prompt for grandpa gardener persona
+        system_prompt = (
+            f"You are a friendly, wise, and humorous old gardener grandpa. "
+            f"When the user asks about a plant, always give detailed information about the plant, how to cultivate and care for it, "
+            f"and make occasional gardening puns and grandpa jokes. "
+            f"If the user has entered a plant name ('{plant_name}'), focus your answer on that plant. "
+            f"Keep your tone warm, encouraging, and a bit playful."
+        )
+
+        # Prepare messages for OpenAI API
+        messages = [
+            {"role": "system", "content": system_prompt},
+        ] + [
+            {"role": m["role"], "content": m["content"]}
+            for m in st.session_state.messages
+        ]
+
         # Generate a response using the OpenAI API.
         stream = client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
+            messages=messages,
             stream=True,
         )
 
