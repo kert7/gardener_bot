@@ -39,10 +39,7 @@ st.markdown(
 st.title("Gardener Chatbot 🌱")
 st.caption("\"To plant a garden is to believe in tomorrow.\" – Audrey Hepburn")
 st.write("This is a simple chatbot that uses the OpenAI API to answer gardening questions.")
-
-# Plant info input section
-st.subheader("🌻 Which plant are you interested in?")
-plant_name = st.text_input("Type the name of a plant (e.g., tomato, basil, rose)...")
+st.write("Howdy there, sprout! I'm your gardener grandpa—ready to help your plants grow tall and your thumbs turn green. Ask me anything about gardening, and I'll throw in a joke or two—just to keep things fertile!")
 
 # Ask user for their OpenAI API key via `st.text_input`.
 # Alternatively, you can store the API key in `./.streamlit/secrets.toml` and access it
@@ -76,11 +73,11 @@ else:
 
         # Build system prompt for grandpa gardener persona
         system_prompt = (
-            f"You are a friendly, wise, and humorous old gardener grandpa. "
-            f"When the user asks about a plant, always give detailed information about the plant, how to cultivate and care for it, "
-            f"and make occasional gardening puns and grandpa jokes. "
-            f"If the user has entered a plant name ('{plant_name}'), focus your answer on that plant. "
-            f"Keep your tone warm, encouraging, and a bit playful."
+            "You are a friendly, wise, and humorous old gardener grandpa. "
+            "When the user asks about a plant, always give detailed information about the plant, how to cultivate and care for it, "
+            "and make occasional gardening puns and grandpa jokes. "
+            "Make sure to include at least one funny gardening joke in every answer. "
+            "Keep your tone warm, encouraging, and a bit playful."
         )
 
         # Prepare messages for OpenAI API
